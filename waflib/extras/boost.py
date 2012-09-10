@@ -287,6 +287,10 @@ def check_boost(self, *k, **kw):
 	path, libs = self.boost_get_libs(**params)
 	self.env['%sLIBPATH_%s' % (suffix, var)] = [path]
 	self.env['%sLIB_%s' % (suffix, var)] = libs
+	for name, lib in zip(Utils.to_list(params['lib']), libs):
+		self.env['INCLUDES_%s_%s' % (var, name)] = inc
+		self.env['%sLIBPATH_%s_%s' % (suffix, var, name)] = [path]
+		self.env['%sLIB_%s_%s' % (suffix, var, name)] = [lib]
 	self.end_msg('ok')
 	if Logs.verbose:
 		Logs.pprint('CYAN', '	path : %s' % path)
@@ -300,7 +304,7 @@ def check_boost(self, *k, **kw):
 			  '#include <boost/system/error_code.hpp>',
 			  'int main() { boost::system::error_code c; }',
 			 ]),
-			 use=var,
+			 use=var+'_system',
 			 execute=False,
 			)
 		if 'thread' in params['lib']:
@@ -309,7 +313,7 @@ def check_boost(self, *k, **kw):
 			  '#include <boost/thread.hpp>',
 			  'int main() { boost::thread t; }',
 			 ]),
-			 use=var,
+			 use=var+'_thread',
 			 execute=False,
 			)
 
